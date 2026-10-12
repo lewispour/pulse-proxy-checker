@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse — Proxy Checker</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">
+            <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+              <defs>
+                <linearGradient id="pulseGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#8dff9e"/>
+                  <stop offset="1" stop-color="#36e2ff"/>
+                </linearGradient>
+                <filter id="pulseGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="2.2" result="b"/>
+                  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle cx="24" cy="24" r="21" fill="none" stroke="url(#pulseGrad)" stroke-width="2.5" opacity="0.28"/>
+              <path d="M4 24 H15 L19 13 L25 35 L29 20 L32 24 H44"
+                    fill="none" stroke="url(#pulseGrad)" stroke-width="3.2"
+                    stroke-linecap="round" stroke-linejoin="round" filter="url(#pulseGlow)"/>
+            </svg>
+          </span>
+          <span class="brand-name">Pulse</span>
+          <span class="brand-tag">proxy checker</span>
+        </div>
+      </header>
+
+      <!-- ======================= INPUT VIEW ======================= -->
+      <main class="content" id="view-input">
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="paste">Paste</button>
+          <button class="mode-tab" data-mode="free">Free Proxies</button>
+          <button class="mode-tab" data-mode="saved">Saved Proxies</button>
+        </div>
+
+        <div class="content-head">
+          <h1 id="page-title">Paste Your Proxies</h1>
+          <div class="controls">
+            <label class="field-inline">
+              Concurrency
+              <input id="concurrency" type="number" min="1" max="500" value="100" />
+            </label>
+            <label class="field-inline">
+              Timeout (ms)
+              <input id="timeout" type="number" min="1000" step="500" value="6000" />
+            </label>
+          </div>
+        </div>
+
+        <div class="protocol-row">
+          <span class="protocol-label">Protocol:</span>
+          <div class="pill-group" id="protocol-group">
+            <button class="pill active" data-scheme="http">HTTP</button>
+            <button class="pill" data-scheme="https">HTTPS</button>
+            <button class="pill" data-scheme="socks4">SOCKS4</button>
+            <button class="pill" data-scheme="socks5">SOCKS5</button>
+          </div>
+        </div>
+
+        <div class="free-bar" id="free-bar" hidden>
+          <button class="btn-primary" id="btn-find-alive">⚡ Find Alive Proxies</button>
+          <span class="free-status" id="free-status">Pulls fresh proxies from public lists, then checks which are alive.</span>
+        </div>
+
+        <textarea
+          id="proxy-input"
+          class="proxy-input"
+          spellcheck="false"
+          placeholder="Paste proxy list in any of these formats:
+  • {host}:{port}
+  • {host}:{port}:{username}:{password}
+  • {host}:{port}@{username}:{password}
+  • {scheme}://{host}:{port}
+  • {scheme}://{username}:{password}@{host}:{port}
+  ({scheme} = http, https, socks4, socks5 — defaults to the Protocol selected above)"
+        ></textarea>
+
+        <div class="footer-row">
+          <span class="counter"><span class="info-dot">ⓘ</span> <b id="proxy-count">0</b> proxies</span>
+          <div class="footer-actions">
+            <button class="btn-ghost" id="btn-clear">Clear</button>
+            <button class="btn-primary" id="btn-check" disabled>Check Proxies</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- ======================= CHECKER VIEW ======================= -->
+      <main class="content" id="view-checker" hidden>
+        <div class="content-head">
+          <div class="check-title">
+            <button class="btn-back" id="btn-back">←</button>
+            <h1 id="check-title">Checking proxies…</h1>
+          </div>
+          <div class="footer-actions">
+            <button class="btn-ghost" id="btn-save-all" disabled>💾 Save all working</button>
+            <button class="btn-ghost" id="btn-save-working" disabled>💾 Save filtered</button>
+            <button class="btn-ghost" id="btn-copy" disabled>Copy</button>
+            <button class="btn-ghost" id="btn-export" disabled>Export</button>
+          </div>
+        </div>
+
+        <div class="results-head">
+          <div class="stat"><b id="stat-total">0</b><span>total</span></div>
+          <div class="stat ok"><b id="stat-working">0</b><span>working</span></div>
+          <div class="stat dead"><b id="stat-dead">0</b><span>dead</span></div>
+          <div class="progress"><div class="bar" id="progress-bar"></div></div>
+        </div>
+        <div class="check-status" id="check-status"></div>
+
+        <!-- filter bar (shared markup pattern, this instance drives the checker list) -->
+        <div class="filter-bar" id="filter-bar">
+          <label class="toggle"><input type="checkbox" id="hide-dead" checked /> Hide non-working</label>
+          <label class="field-inline">Risk
+            <select id="f-risk"><option value="">All</option><option>Low</option><option>Medium</option><option>High</option></select>
+          </label>
+          <label class="field-inline">Country
+            <select id="f-country"><option value="">All</option></select>
+          </label>
+          <label class="field-inline">Max latency (ms)
+            <input id="f-latency" type="number" min="0" step="500" placeholder="any" />
+          </label>
+          <label class="field-inline">Min quality (%)
+            <input id="f-quality" type="number" min="0" max="100" step="5" placeholder="any" />
+          </label>
+          <span class="filter-count" id="filter-count"></span>
+        </div>
+
+        <div class="results-cols">
+          <span></span><span>Proxy</span><span>Status</span><span>Country</span>
+          <span>Resolved IP</span><span>Quality</span><span>Risk</span><span>Latency</span>
+        </div>
+        <div class="results-list big" id="results-list"></div>
+      </main>
+
+      <!-- ======================= SAVED PROXIES VIEW ======================= -->
+      <main class="content" id="view-saved" hidden>
+        <div class="mode-tabs">
+          <button class="mode-tab" data-mode="paste">Paste</button>
+          <button class="mode-tab" data-mode="free">Free Proxies</button>
+          <button class="mode-tab active" data-mode="saved">Saved Proxies</button>
+        </div>
+        <div class="content-head">
+          <h1>Saved Proxies</h1>
+          <div class="footer-actions">
+            <div class="pill-group" id="saved-proto-group">
+              <button class="pill active" data-scheme="http">HTTP</button>
+              <button class="pill" data-scheme="https">HTTPS</button>
+              <button class="pill" data-scheme="socks4">SOCKS4</button>
+              <button class="pill" data-scheme="socks5">SOCKS5</button>
+            </div>
+          </div>
+        </div>
+        <div class="footer-actions" style="justify-content:flex-start; gap:10px;">
+          <button class="btn-primary" id="btn-recheck-saved">♻ Recheck all</button>
+          <button class="btn-ghost" id="btn-remove-dead" disabled>🗑 Remove dead</button>
+          <button class="btn-ghost" id="btn-saved-copy" disabled>Copy</button>
+          <button class="btn-ghost" id="btn-saved-export" disabled>Export</button>
+          <button class="btn-ghost" id="btn-saved-clear" disabled>Clear pool</button>
+          <span class="check-status" id="saved-status"></span>
+        </div>
+
+        <div class="filter-bar" id="saved-filter-bar">
+          <label class="toggle"><input type="checkbox" id="sf-hide-dead" /> Hide non-working</label>
+          <label class="field-inline">Risk
+            <select id="sf-risk"><option value="">All</option><option>Low</option><option>Medium</option><option>High</option></select>
+          </label>
+          <label class="field-inline">Country
+            <select id="sf-country"><option value="">All</option></select>
+          </label>
+          <label class="field-inline">Max latency (ms)
+            <input id="sf-latency" type="number" min="0" step="500" placeholder="any" />
+          </label>
+          <label class="field-inline">Min quality (%)
+            <input id="sf-quality" type="number" min="0" max="100" step="5" placeholder="any" />
+          </label>
+          <span class="filter-count" id="saved-filter-count"></span>
+        </div>
+
+        <div class="results-cols">
+          <span></span><span>Proxy</span><span>Status</span><span>Country</span>
+          <span>Resolved IP</span><span>Quality</span><span>Risk</span><span>Latency</span>
+        </div>
+        <div class="results-list big" id="saved-list"></div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

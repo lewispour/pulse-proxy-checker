@@ -1,0 +1,27 @@
+{
+  "name": "pulse-engine",
+  "version": "1.0.0",
+  "description": "Pulse proxy-checking engine",
+  "bin": {
+    "PulseEngine": "src/host.js"
+  },
+  "scripts": {
+    "start": "node src/host.js",
+    "check": "node src/cli.js",
+    "pkg": "pkg . --targets node18-macos-x64 --output PulseEngine"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.4",
+    "maxmind": "^5.0.7",
+    "node-fetch": "^2.7.0",
+    "socks-proxy-agent": "^8.0.3"
+  },
+  "pkg": {
+    "assets": [
+      "data/*.mmdb"
+    ],
+    "scripts": [
+      "src/**/*.js"
+    ]
+  }
+}

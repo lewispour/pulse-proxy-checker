@@ -1,0 +1,103 @@
+name: Release
+
+# Build macOS + Windows installers and attach them to a GitHub Release.
+# Triggers on a version tag (e.g. v1.0) or manually.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            pkg_target: node18-macos-x64,node18-macos-arm64
+            engine_out: PulseEngine
+            tauri_args: "--target universal-apple-darwin"
+          - os: windows-latest
+            pkg_target: node18-win-x64
+            engine_out: PulseEngine.exe
+            tauri_args: ""
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin,aarch64-apple-darwin' || '' }}
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install engine dependencies
+        working-directory: host
+        run: npm ci || npm install
+
+      - name: Build engine (pkg, self-contained with GeoIP)
+        working-directory: host
+        run: npx -y pkg@5.8.1 . --targets ${{ matrix.pkg_target }} --output dist/${{ matrix.engine_out }}
+
+      - name: Stage engine into Tauri resources
+        shell: bash
+        run: |
+          mkdir -p src-tauri/assets
+          cp host/dist/${{ matrix.engine_out }} src-tauri/assets/${{ matrix.engine_out }}
+
+      - name: Install UI dependencies
+        working-directory: ui
+        run: npm ci || npm install
+
+      - name: Build UI
+        working-directory: ui
+        run: npm run build
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - name: Build app
+        working-directory: src-tauri
+        run: cargo tauri build ${{ matrix.tauri_args }}
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p out
+          # macOS: .dmg ; Windows: .exe (nsis) / .msi
+          find src-tauri/target -type f \( -name "*.dmg" -o -name "*-setup.exe" -o -name "*.msi" \) -exec cp {} out/ \; || true
+          ls -la out
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-${{ matrix.os }}
+          path: out/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
+          generate_release_notes: true

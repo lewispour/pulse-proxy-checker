@@ -1,0 +1,16 @@
+# Rust / Tauri
+/src-tauri/target/
+/src-tauri/gen/schemas/
+
+# Node
+node_modules/
+/host/dist/
+/ui/dist/
+
+# Bundled engine binaries (built in CI per-platform; not committed)
+/src-tauri/assets/PulseEngine
+/src-tauri/assets/PulseEngine.exe
+
+# OS / editor
+.DS_Store
+*.log

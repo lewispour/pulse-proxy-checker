@@ -1,0 +1,20 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions the Pulse webview needs: listen to events and call the app's commands + plugins.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "core:window:default",
+    "core:webview:default",
+    "opener:default",
+    "dialog:default",
+    "fs:default",
+    "store:default",
+    "deep-link:default"
+  ]
+}

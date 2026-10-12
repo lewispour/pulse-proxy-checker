@@ -157,7 +157,6 @@ community-maintained projects — huge thanks to their authors:
 | [PROXY-List](https://github.com/TheSpeedX/PROXY-List) | TheSpeedX | credit requested |
 | [proxy-list](https://github.com/monosans/proxy-list) | monosans | MIT |
 | [free-proxy-list](https://github.com/proxifly/free-proxy-list) | Proxifly | GPLv3 |
-| [proxy-list](https://github.com/jetkai/proxy-list) | jetkai | MIT |
 | [ProxyScrape API](https://proxyscrape.com) | ProxyScrape | free tier |
 
 Pulse **fetches these lists live and discards them after checking** — it does not

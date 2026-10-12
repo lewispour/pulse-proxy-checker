@@ -27,7 +27,6 @@ community projects (lists are used transiently and never bundled or redistribute
 - **TheSpeedX/PROXY-List** — <https://github.com/TheSpeedX/PROXY-List> (credit requested)
 - **monosans/proxy-list** — <https://github.com/monosans/proxy-list> (MIT)
 - **proxifly/free-proxy-list** — <https://github.com/proxifly/free-proxy-list> (GPLv3)
-- **jetkai/proxy-list** — <https://github.com/jetkai/proxy-list> (MIT)
 - **ProxyScrape** — <https://proxyscrape.com> (free API tier)
 
 ## Software dependencies

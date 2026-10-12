@@ -14,11 +14,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Apple Silicon. pkg can't produce a universal binary (lipo corrupts its
+          # appended payload), so we build one arch and a matching arm64 .dmg.
           - os: macos-latest
-            pkg_target: node18-macos-x64,node18-macos-arm64
+            rust_target: aarch64-apple-darwin
+            pkg_target: node18-macos-arm64
             engine_out: PulseEngine
-            tauri_args: "--target universal-apple-darwin"
+            tauri_args: "--target aarch64-apple-darwin"
+          # Intel Macs.
+          - os: macos-13
+            rust_target: x86_64-apple-darwin
+            pkg_target: node18-macos-x64
+            engine_out: PulseEngine
+            tauri_args: "--target x86_64-apple-darwin"
           - os: windows-latest
+            rust_target: ""
             pkg_target: node18-win-x64
             engine_out: PulseEngine.exe
             tauri_args: ""
@@ -36,7 +46,7 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin,aarch64-apple-darwin' || '' }}
+          targets: ${{ matrix.rust_target }}
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2

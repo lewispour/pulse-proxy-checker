@@ -581,3 +581,29 @@ savedClearBtn.addEventListener("click", async () => {
 });
 
 refreshCount();
+
+// ============================ update check (launch) ============================
+(async function checkForUpdate() {
+  const banner = $("update-banner");
+  const text = $("update-text");
+  const download = $("update-download");
+  const dismiss = $("update-dismiss");
+  let updateUrl = "https://github.com/lewispour/pulse-proxy-checker/releases/latest";
+
+  dismiss.addEventListener("click", () => { banner.hidden = true; });
+  download.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try { await invoke("plugin:opener|open_url", { url: updateUrl }); } catch { /* ignore */ }
+  });
+
+  try {
+    const info = await invoke("check_for_update");
+    if (info && info.update) {
+      updateUrl = info.url || updateUrl;
+      text.textContent = `Pulse ${info.latest} is available (you have ${info.current}).`;
+      banner.hidden = false;
+    }
+  } catch {
+    // offline / rate-limited — stay silent, never block the app.
+  }
+})();

@@ -31,6 +31,21 @@ body {
 }
 #app { display: flex; flex-direction: column; }
 
+.update-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 20px; font-size: 13px; color: var(--accent-ink);
+  background: var(--grad);
+}
+.update-download {
+  color: var(--accent-ink); font-weight: 800; text-decoration: none;
+  border-bottom: 1px solid rgba(4,42,24,.4);
+}
+.update-dismiss {
+  margin-left: auto; background: transparent; border: none;
+  color: var(--accent-ink); font-size: 14px; cursor: pointer; opacity: .7;
+}
+.update-dismiss:hover { opacity: 1; }
+
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 28px; border-bottom: 1px solid var(--border);

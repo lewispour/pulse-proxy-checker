@@ -21,6 +21,7 @@ pub fn run() {
             crate::proxy_checker_service::load_saved,
             crate::proxy_checker_service::save_saved,
             crate::proxy_checker_service::export_proxies,
+            crate::update::check_for_update,
             install_native_host_cmd,
             install_firefox_native_host_cmd,
         ])

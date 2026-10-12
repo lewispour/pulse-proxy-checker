@@ -19,8 +19,10 @@ const DEFAULT_SCHEME = 'http';
 const RE_SCHEME_AUTH = /^(\w+):\/\/([\w.-]+):(.*)@([\w.-]+):(\d+)$/;
 // scheme://host:port
 const RE_SCHEME_PLAIN = /^(\w+):\/\/([\w.-]+):(\d+)$/;
-// host:port@user:pass
+// host:port@user:pass  (host:port BEFORE the @)
 const RE_HOSTPORT_AUTH = /^([\w.-]+):(\d+)@([\w.-]+):(.*)$/;
+// user:pass@host:port  (host:port AFTER the @ — standard URL order, no scheme)
+const RE_AUTH_HOSTPORT = /^([^:@]+):(.*)@([\w.-]+):(\d+)$/;
 // host:port:user:pass
 const RE_HOSTPORT_COLON = /^([\w.-]+):(\d+):([^:]+):(.*)$/;
 // host:port
@@ -50,8 +52,12 @@ function parseProxy(line) {
     return build(m[1], m[2], m[3], null, null, raw);
   }
   if ((m = RE_HOSTPORT_AUTH.exec(raw))) {
-    // host:port@user:pass
+    // host:port@user:pass  (numeric port before @)
     return build(DEFAULT_SCHEME, m[1], m[2], m[3], m[4], raw);
+  }
+  if ((m = RE_AUTH_HOSTPORT.exec(raw))) {
+    // user:pass@host:port  (numeric port after @ — standard order, no scheme)
+    return build(DEFAULT_SCHEME, m[3], m[4], m[1], m[2], raw);
   }
   if ((m = RE_HOSTPORT_COLON.exec(raw))) {
     // host:port:user:pass

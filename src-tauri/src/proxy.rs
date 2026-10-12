@@ -40,11 +40,28 @@ impl Proxy {
             return Some(Proxy::build(scheme, host, port, None, None, raw));
         }
 
-        // host:port@user:pass
-        if let Some((hostport, auth)) = raw.split_once('@') {
-            let (host, port) = parse_host_port(hostport)?;
-            let (user, pass) = auth.split_once(':')?;
-            return Some(Proxy::build("http".into(), host, port, Some(user), Some(pass), raw));
+        // Forms with an `@`: either host:port@user:pass or user:pass@host:port.
+        // Pick whichever side is a valid host:port (numeric port).
+        if let Some((left, right)) = raw.split_once('@') {
+            // host:port@user:pass
+            if let (Some((host, port)), Some((user, pass))) =
+                (parse_host_port(left), right.split_once(':'))
+            {
+                return Some(Proxy::build("http".into(), host, port, Some(user), Some(pass), raw));
+            }
+            // user:pass@host:port (standard URL order without scheme)
+            if let (Some((user, pass)), Some((host, port))) =
+                (left.split_once(':'), parse_host_port(right))
+            {
+                return Some(Proxy::build(
+                    "http".into(),
+                    host,
+                    port,
+                    Some(user),
+                    Some(pass),
+                    raw,
+                ));
+            }
         }
 
         // host:port:user:pass  or  host:port

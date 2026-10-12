@@ -27,6 +27,13 @@ assert.deepStrictEqual(
 );
 ok('scheme://user:pass@host:port');
 
+// scheme-less user:pass@host:port (standard URL order without the scheme)
+assert.deepStrictEqual(
+  pick(parseProxy('user47:Pass_sess-xY5@24.199.68.169:31112')),
+  { scheme: 'http', host: '24.199.68.169', port: 31112, username: 'user47', password: 'Pass_sess-xY5' }
+);
+ok('user:pass@host:port (no scheme)');
+
 assert.strictEqual(parseProxy('5.6.7.8:1080').scheme, 'http');
 ok('bare host:port defaults to http');
 

@@ -21,12 +21,6 @@ jobs:
             pkg_target: node18-macos-arm64
             engine_out: PulseEngine
             tauri_args: "--target aarch64-apple-darwin"
-          # Intel Macs.
-          - os: macos-13
-            rust_target: x86_64-apple-darwin
-            pkg_target: node18-macos-x64
-            engine_out: PulseEngine
-            tauri_args: "--target x86_64-apple-darwin"
           - os: windows-latest
             rust_target: ""
             pkg_target: node18-win-x64

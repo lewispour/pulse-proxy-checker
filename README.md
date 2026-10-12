@@ -8,11 +8,35 @@ Check HTTP / HTTPS / SOCKS4 / SOCKS5 proxies, pull fresh ones from public lists,
 keep a maintained pool of your working proxies — with live results, country / quality /
 risk data, and **zero API rate limits**.
 
+[![Release](https://img.shields.io/github/v/release/lewispour/pulse-proxy-checker?include_prereleases&sort=semver&color=8dff9e)](../../releases)
+[![Downloads](https://img.shields.io/github/downloads/lewispour/pulse-proxy-checker/total?color=36e2ff)](../../releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-8dff9e.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-36e2ff)](../../releases)
+[![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20%2B%20Rust-8dff9e)](https://tauri.app)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-36e2ff.svg)](#contributing)
+
 ![Pulse — checking proxies live](docs/screenshots/pulse-results.png)
 
 </div>
 
 ---
+
+## About
+
+**Pulse** is a free, open-source **proxy checker** and **proxy tester** for the
+desktop. Paste a proxy list — or let Pulse **scrape thousands of free proxies** from
+public sources — and it verifies which are alive across **HTTP, HTTPS, SOCKS4 and
+SOCKS5**, streaming results live. Every working proxy is enriched with its **country,
+resolved exit IP, ISP/ASN, a quality score, and a risk rating** — all computed
+**locally** from a bundled GeoIP database, so there are **no API keys and no rate
+limits**. Keep a curated **pool of working proxies** per protocol, recheck it anytime,
+filter by risk/country/latency/quality, and export the results.
+
+Built with **Tauri + Rust** (native, lightweight) and a **Node.js** checking engine.
+Runs on **macOS and Windows**. MIT licensed.
+
+> **Keywords:** proxy checker · proxy tester · proxy validator · proxy scraper ·
+> free proxy list · HTTP/HTTPS/SOCKS4/SOCKS5 proxies · proxy pool · bulk proxy checker
 
 ## Features
 

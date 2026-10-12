@@ -1,7 +1,7 @@
 name: Release
 
 # Build macOS + Windows installers and attach them to a GitHub Release.
-# Triggers on a version tag (e.g. v1.0) or manually.
+# Triggers on a version tag (e.g. v1.0.1) or manually.
 on:
   push:
     tags:
@@ -28,6 +28,8 @@ jobs:
             tauri_args: ""
 
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -65,43 +67,17 @@ jobs:
         working-directory: ui
         run: npm ci || npm install
 
-      - name: Build UI
-        working-directory: ui
-        run: npm run build
-
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^2" --locked
-
-      - name: Build app
-        working-directory: src-tauri
-        run: cargo tauri build ${{ matrix.tauri_args }}
-
-      - name: Collect artifacts
-        shell: bash
-        run: |
-          mkdir -p out
-          # macOS: .dmg ; Windows: .exe (nsis) / .msi
-          find src-tauri/target -type f \( -name "*.dmg" -o -name "*-setup.exe" -o -name "*.msi" \) -exec cp {} out/ \; || true
-          ls -la out
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      # tauri-action builds the app (prebuilt Tauri CLI — no slow cargo install),
+      # creates/updates the GitHub Release for the tag, and uploads the installers.
+      - name: Build & release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: pulse-${{ matrix.os }}
-          path: out/*
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/**/*
-          generate_release_notes: true
+          projectPath: src-tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: "Pulse ${{ github.ref_name }}"
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.tauri_args }}
+          includeUpdaterJson: false

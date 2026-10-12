@@ -3,8 +3,16 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import "flag-icons/css/flag-icons.min.css";
 
 const $ = (id) => document.getElementById(id);
+
+// Cross-platform flag: an <i class="fi fi-xx"> image (emoji flags don't render
+// on Windows). Returns empty string for unknown/missing country codes.
+function flagHtml(cc) {
+  if (!cc || cc.length !== 2) return "";
+  return `<span class="fi fi-${cc.toLowerCase()}"></span>`;
+}
 
 const input = $("proxy-input");
 const countEl = $("proxy-count");
@@ -166,7 +174,7 @@ function resetFilters() {
 
 function populateCountryFilter() {
   const seen = new Map();
-  for (const r of lastResults) if (r.ok && r.countryCode) seen.set(r.countryCode, `${r.flag || ""} ${r.countryCode}`);
+  for (const r of lastResults) if (r.ok && r.countryCode) seen.set(r.countryCode, r.countryCode);
   const cur = fCountry.value;
   fCountry.innerHTML = '<option value="">All</option>' +
     [...seen.entries()].sort().map(([cc, label]) => `<option value="${cc}">${label}</option>`).join("");
@@ -418,7 +426,7 @@ function maybeAddCountry(r) {
   if (__countrySeen.has(r.countryCode)) return;
   __countrySeen.add(r.countryCode);
   const opt = document.createElement("option");
-  opt.value = r.countryCode; opt.textContent = `${r.flag || ""} ${r.countryCode}`;
+  opt.value = r.countryCode; opt.textContent = r.countryCode;
   fCountry.appendChild(opt);
 }
 
@@ -432,7 +440,8 @@ function buildRow(r) {
   const row = document.createElement("div");
   row.className = "result-row " + (r.ok ? "ok" : "dead");
   const status = r.ok ? "Success" : (r.error || "Failed");
-  const country = r.ok ? `${r.flag || ""} ${r.countryCode || "??"}` : "";
+  // flag is trusted markup (built from a validated 2-letter code); code is escaped.
+  const country = r.ok ? `${flagHtml(r.countryCode)} ${escapeHtml(r.countryCode || "??")}` : "";
   const exit = r.ok && r.exitIp ? r.exitIp : "";
   const quality = r.ok && r.quality != null ? `${r.quality}%` : "";
   const risk = r.ok && r.risk ? r.risk : "";
@@ -442,7 +451,7 @@ function buildRow(r) {
     <span class="dot" title="${escapeHtml(r.isp || "")}"></span>
     <span class="col-proxy raw">${escapeHtml(r.raw)}</span>
     <span class="col-status">${escapeHtml(status)}</span>
-    <span class="col-country">${escapeHtml(country)}</span>
+    <span class="col-country">${country}</span>
     <span class="col-ip">${escapeHtml(exit)}</span>
     <span class="col-quality"><span class="qbar"><span style="width:${r.ok ? r.quality : 0}%"></span></span>${quality}</span>
     <span class="col-risk ${riskClass}">${escapeHtml(risk)}</span>
@@ -495,7 +504,7 @@ Object.values(savedFilterEls).forEach((el) => el.addEventListener("input", rende
 
 function populateSavedCountryFilter() {
   const seen = new Map();
-  for (const r of savedPool) if (r.ok && r.countryCode) seen.set(r.countryCode, `${r.flag || ""} ${r.countryCode}`);
+  for (const r of savedPool) if (r.ok && r.countryCode) seen.set(r.countryCode, r.countryCode);
   const cur = savedFilterEls.country.value;
   savedFilterEls.country.innerHTML = '<option value="">All</option>' +
     [...seen.entries()].sort().map(([cc, label]) => `<option value="${cc}">${label}</option>`).join("");

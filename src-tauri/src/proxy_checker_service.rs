@@ -7,6 +7,18 @@ use std::process::{Command, Stdio};
 use std::sync::{Mutex, OnceLock};
 use tauri::{AppHandle, Emitter, Manager};
 
+/// On Windows, spawning a console subprocess pops up a black terminal window.
+/// Apply CREATE_NO_WINDOW so the engine runs hidden. No-op on other platforms.
+fn hide_console(cmd: &mut Command) -> &mut Command {
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd
+}
+
 /// PIDs of currently-running engine child processes, so `cancel_check` can kill
 /// them when the user navigates back mid-run.
 fn active_children() -> &'static Mutex<Vec<u32>> {
@@ -31,9 +43,24 @@ fn unregister_child(pid: u32) {
 pub fn cancel_check() {
     let pids: Vec<u32> = active_children().lock().map(|v| v.clone()).unwrap_or_default();
     for pid in pids {
-        // SIGTERM the engine; host.js handles it and exits, ending the read loop.
-        let _ = Command::new("kill").arg(pid.to_string()).status();
+        kill_pid(pid);
         unregister_child(pid);
+    }
+}
+
+/// Kill a process by PID, per-platform, without flashing a console window.
+fn kill_pid(pid: u32) {
+    #[cfg(windows)]
+    {
+        let mut cmd = Command::new("taskkill");
+        cmd.args(["/PID", &pid.to_string(), "/T", "/F"]);
+        hide_console(&mut cmd);
+        let _ = cmd.status();
+    }
+    #[cfg(not(windows))]
+    {
+        // SIGTERM; host.js handles it and exits cleanly, ending the read loop.
+        let _ = Command::new("kill").arg(pid.to_string()).status();
     }
 }
 
@@ -211,11 +238,13 @@ async fn run_engine_async(
     let (program, prefix_args) = crate::host::resolve_engine_command(&resource_dir);
 
     tauri::async_runtime::spawn_blocking(move || {
-        let mut child = Command::new(&program)
-            .args(&prefix_args)
+        let mut cmd = Command::new(&program);
+        cmd.args(&prefix_args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null())
+            .stderr(Stdio::null());
+        hide_console(&mut cmd);
+        let mut child = cmd
             .spawn()
             .map_err(|e| format!("Failed to spawn engine: {e}"))?;
 

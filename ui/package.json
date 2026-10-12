@@ -1,6 +1,6 @@
 {
   "name": "pulse-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2"
+    "@tauri-apps/api": "^2",
+    "flag-icons": "^7.5.0"
   },
   "devDependencies": {
     "vite": "^5"

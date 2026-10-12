@@ -9,7 +9,7 @@ keep a maintained pool of your working proxies — with live results, country / 
 risk data, and **zero API rate limits**.
 
 [![Release](https://img.shields.io/github/v/release/lewispour/pulse-proxy-checker?include_prereleases&sort=semver&color=8dff9e)](../../releases)
-[![Downloads](https://img.shields.io/github/downloads/lewispour/pulse-proxy-checker/total?color=36e2ff)](../../releases)
+[![Stars](https://img.shields.io/github/stars/lewispour/pulse-proxy-checker?color=36e2ff)](../../stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-8dff9e.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-36e2ff)](../../releases)
 [![Built with Tauri](https://img.shields.io/badge/built%20with-Tauri%20%2B%20Rust-8dff9e)](https://tauri.app)

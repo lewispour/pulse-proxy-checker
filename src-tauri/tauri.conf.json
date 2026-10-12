@@ -5,9 +5,7 @@
   "identifier": "com.pulse.app",
   "build": {
     "frontendDist": "../ui/dist",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm --prefix ../ui run build",
-    "beforeDevCommand": "npm --prefix ../ui run dev"
+    "devUrl": "http://localhost:1420"
   },
   "app": {
     "windows": [

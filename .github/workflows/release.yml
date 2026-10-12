@@ -67,6 +67,10 @@ jobs:
         working-directory: ui
         run: npm ci || npm install
 
+      - name: Build UI
+        working-directory: ui
+        run: npm run build
+
       # tauri-action builds the app (prebuilt Tauri CLI — no slow cargo install),
       # creates/updates the GitHub Release for the tag, and uploads the installers.
       - name: Build & release

@@ -111,10 +111,17 @@ quality/risk heuristics, UI polish, docs — PRs of all sizes are appreciated.
 
 Found a bug or have an idea? [Open an issue](../../issues).
 
-## GeoIP data
+## GeoIP data & attribution
 
-Country / ISP / ASN lookups use **[DB-IP Lite](https://db-ip.com/db/lite.php)**
-(CC-BY) `.mmdb` databases under `host/data/`, refreshable monthly.
+Country / ISP / ASN lookups use the **[DB-IP Lite](https://db-ip.com/db/lite.php)**
+databases (`host/data/*.mmdb`), refreshable monthly. They are licensed under
+**[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)** — free to use and
+redistribute (including commercially) **with attribution**. Pulse displays the
+required *"IP Geolocation by DB-IP"* credit in the app UI.
+
+> IP Geolocation by DB-IP — <https://db-ip.com>
+
+See [NOTICE.md](NOTICE.md) for full third-party notices.
 
 ## Privacy
 
@@ -124,4 +131,8 @@ lookups to read each proxy's exit IP.
 
 ## License
 
-[MIT](LICENSE) — free to use, modify, and distribute.
+Pulse's source code is [MIT](LICENSE) — free to use, modify, and distribute.
+
+The bundled DB-IP Lite geolocation data is a separate work under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (attribution required) —
+see [NOTICE.md](NOTICE.md). MIT covers the code, not the data.

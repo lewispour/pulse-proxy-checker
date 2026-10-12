@@ -46,6 +46,8 @@ body {
   font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase;
   letter-spacing: 1.5px; align-self: center; margin-top: 4px;
 }
+.attribution { color: var(--muted); font-size: 11px; text-decoration: none; opacity: .7; }
+.attribution:hover { opacity: 1; color: var(--accent-2); }
 .topbar-actions { display: flex; gap: 10px; }
 .icon-btn {
   width: 40px; height: 40px; border-radius: 50%;

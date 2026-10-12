@@ -147,6 +147,22 @@ required *"IP Geolocation by DB-IP"* credit in the app UI.
 
 See [NOTICE.md](NOTICE.md) for full third-party notices.
 
+## Proxy sources & credits
+
+The **Free Proxies** finder pulls public proxy lists at runtime from these
+community-maintained projects — huge thanks to their authors:
+
+| Source | Author | License |
+|--------|--------|---------|
+| [PROXY-List](https://github.com/TheSpeedX/PROXY-List) | TheSpeedX | credit requested |
+| [proxy-list](https://github.com/monosans/proxy-list) | monosans | MIT |
+| [free-proxy-list](https://github.com/proxifly/free-proxy-list) | Proxifly | GPLv3 |
+| [proxy-list](https://github.com/jetkai/proxy-list) | jetkai | MIT |
+| [ProxyScrape API](https://proxyscrape.com) | ProxyScrape | free tier |
+
+Pulse **fetches these lists live and discards them after checking** — it does not
+bundle, store, or redistribute any provider's proxy data.
+
 ## Privacy
 
 All checking happens on your machine. The only network traffic is: fetching public
